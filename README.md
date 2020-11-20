@@ -18,7 +18,7 @@
 
 其中，Darknet 的配置参考[这里](https://github.com/AlexeyAB/darknet/blob/master/README.md), JetPack 的配置参考[这里](https://developer.nvidia.com/embedded/jetpack),
 
-另外，还使用了项目[pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4),用于将训练好的模型转为ONNX格式。
+另外，还使用了项目[pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4),用于将训练好的模型转为ONNX格式，以及Nvidia[官方示例](https://github.com/NVIDIA-AI-IOT/yolov4_deepstream.git)。
 
 ## 1.数据准备
 
@@ -26,25 +26,25 @@
 共有反光衣检测数据1083张。
 
 * 进入[百度云盘下载链接](https://pan.baidu.com/s/1_Ei9bYmUpa-8q-hXZk1u8w) 提取码->(dooh).
-* 将数据文件夹中‘labels/'下的文件复制到‘JPEGImages/’中，即保证两者在同一个文件夹下。
+* 将数据文件夹中‘labels/'下的文件复制到‘JPEGImages/’中，保证两者在同一个文件夹下。
 * 修改配置文件
     ```sh
     cd darkent
     ```
     * 在‘cfg/'路径下创建配置文件‘yolov4-reflective.cfg'，当然可以直接从'yolov4-custom.cfg'直接复制过来。
     * 修改参数，classes = 2， filters=(classes + 5)x3 = 21，注意：每个[yolo]层里的classes及其前一个[convolutional]层里的filters参数都需要相应修改，注意是每一个！
-    ```ini
+        ```ini
         [convolutional]
         filters=21
         
         [yolo]
         classes=2
-    ```
+        ```
     * 其他参数如batch，learning_rate等可以根据需要修改。
 * 准备数据文件，包含四个文件‘reflective.data','reflective.names','train-reflective.txt','valid-reflective.txt'.
     * 进行训练集验证集数据划分，将划分好的文件 'train_reflective.txt' 和 'valid_reflective.txt' 放到 'data/' 文件夹下。
         ```ini
-            python3 split_datasets(<imagePath> <savePath>)
+        python3 split_datasets(<imagePath> <savePath>)
         ```
       参数说明：
       
@@ -53,17 +53,17 @@
       savePath即生成文件的保存路径，可以直接设置为'/path where darknet installed/data/'
     * 创建‘reflective.data'：
         ```ini
-            classes = 2
-            train = data/train-reflective.txt 
-            valid = data/valid-reflective.txt
-            test = data/test-reflective.txt
-            names = data/reflective.names
-            backup = reflective/
+        classes = 2
+        train = data/train-reflective.txt 
+        valid = data/valid-reflective.txt
+        test = data/test-reflective.txt
+        names = data/reflective.names
+        backup = reflective/
         ```
     * 创建'reflective.names'：
         ```ini
-            other
-            reflective
+        other
+        reflective
         ```
 * 详细过程也可参考darknet的[README](https://github.com/AlexeyAB/darknet/blob/master/README.md)。
 
@@ -79,6 +79,9 @@
     sudo ./darknet detector train ./data/reflective.data  ./cfg/yolov4-tiny-reflective.cfg ./pretrained/yolov4-tiny.conv.29 -map -gpus 0,1 -dont_show  
     ```
 * 让我们来看看训练效果如何（yolov4-tiny模型）：
+
+  ![Image text](https://github.com/ruyueshuo/DeepStream_YOLOv4/blob/main/results/chart_yolov4-tiny-reflective.png)
+
     ```sh
     # yolov4-tiny:
     python3 darknet_video.py --input data/test.mp4 --out_filename data/test_result.mp4 --weights reflective/yolov4-tiny-reflective_best.weights  --data_file data/reflective.data  --config_file cfg/yolov4-tiny-reflective.cfg --dont_show     
@@ -87,7 +90,7 @@
 
 ## 3.模型转换
 
-* 将训练好的权重文件转换为ONNX格式，需要注意的是，pytorch-YOLOv4要求pytorch<=1.4.0：
+* 将训练好的权重文件转换为ONNX格式，需要注意的是，pytorch-YOLOv4执行模型转换时要求pytorch<=1.4.0，否则后面转TensorRT Engine 会报错：
     ```sh
     cd pytorch-YOLOv4/
     # python3 demo_darknet2onnx.py <cfgFile> <weightFile> <imageFile> <batchSize>
@@ -95,7 +98,7 @@
     ```ini
     参数说明：  
     <cfgFile> - 配置文件
-    <weightFile> - darknet 训练好的模型
+    <weightFile> - darknet 训练好的模型.weights文件
     <imageFile> - 测试图片
     <batchSize> - 推断时的 batch size，若为正整数(batch_size=1)则静态 batch size，若为负数或0(batch_size=-1)则为动态 batch size.
     ```
@@ -284,7 +287,8 @@
     
 ## 6.结果
 
-* Deepstream部署结果原本Darknet结果对比看[这里](https://www.bilibili.com/video/BV18K4y1Z7LZ)。
-
+* Deepstream部署结果原本Darknet结果对比完整视频在[这里](https://www.bilibili.com/video/BV18K4y1Z7LZ)。
+  
+  ![Image text](https://github.com/ruyueshuo/DeepStream_YOLOv4/blob/main/results/demo.png)
 
 
