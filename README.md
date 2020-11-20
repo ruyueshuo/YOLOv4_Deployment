@@ -22,7 +22,7 @@
 
 ## 1.数据准备
 
-这个项目使用的反光衣检测数据集来自[这里](https://github.com/gengyanlei/reflective-clothes-detect.git)，
+这个项目使用的反光衣检测数据集来自[reflective-clothes-detect and dataset yolov5](https://github.com/gengyanlei/reflective-clothes-detect.git)，
 共有反光衣检测数据1083张。
 
 * 进入[百度云盘下载链接](https://pan.baidu.com/s/1_Ei9bYmUpa-8q-hXZk1u8w) 提取码->(dooh).
@@ -69,7 +69,7 @@
 
 ## 2.模型训练
 
-* 执行训练代码，会在主目录下生成‘chart.png'，可以查看训练过程的loss和map变化，权重文件保存在‘reflective/’文件夹下：
+* 执行训练代码，这里我训练的是yolov4-tiny模型，并且使用了darknet提供的预训练模型：
     ```sh
     cd darknet/
     mkdir reflective
@@ -78,12 +78,12 @@
     # yolov4-tiny:
     sudo ./darknet detector train ./data/reflective.data  ./cfg/yolov4-tiny-reflective.cfg ./pretrained/yolov4-tiny.conv.29 -map -gpus 0,1 -dont_show  
     ```
-* 让我们来看看训练效果如何（yolov4-tiny模型）：
+* 在主目录下会生成‘chart.png'，可以查看训练过程的loss和map变化，权重文件保存在‘reflective/’文件夹下让我们来看看训练效果如何（yolov4-tiny模型）：
 
   ![Image text](https://github.com/ruyueshuo/DeepStream_YOLOv4/blob/main/results/chart_yolov4-tiny-reflective.png)
 
     ```sh
-    # yolov4-tiny:
+    # 在视频上测试模型:
     python3 darknet_video.py --input data/test.mp4 --out_filename data/test_result.mp4 --weights reflective/yolov4-tiny-reflective_best.weights  --data_file data/reflective.data  --config_file cfg/yolov4-tiny-reflective.cfg --dont_show     
     ```
 * 也可以直接采用Pytorch版本进行训练[pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4.git).
