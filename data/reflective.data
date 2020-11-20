@@ -1,0 +1,6 @@
+classes = 2
+train = data/train-reflective.txt
+valid = data/valid-reflective.txt
+test = data/test-reflective.txt
+names = data/reflective.names
+backup = reflective/
