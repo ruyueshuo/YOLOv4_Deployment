@@ -20,7 +20,7 @@
 
 - [ ] TVM
 
-- [ ] Flask
+- [X] [Flask](https://github.com/ruyueshuo/YOLOv4_Deployment/wiki/Depoly-with-Flask)
 
 - [ ] android
 
